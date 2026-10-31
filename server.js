@@ -20,6 +20,19 @@ app.use(express.static(path.join(__dirname, "public")));
 app.get("/", (req, res) => res.redirect("/admin"));
 app.get("/admin/login", (req, res) => res.redirect("/admin"));
 
+const adminPages = {
+  orders: { title: "Orders", subtitle: "Review incoming orders and follow fulfillment progress.", icon: "▤", cards: ["All orders", "New orders", "Preparing", "Completed"], note: "Connect this page to the Goan Craving orders collection to show live order records and status controls." },
+  customers: { title: "Customers", subtitle: "Customer profiles, contact details, and order history.", icon: "♙", cards: ["Customer directory", "New customers", "Returning customers", "Customer support"], note: "Connect this page to the customer and order collections for live profiles and history." },
+  analytics: { title: "Analytics & reports", subtitle: "Track store performance across your selected date range.", icon: "▥", cards: ["Revenue trends", "Order volume", "Average order value", "Customer growth"], note: "Analytics currently uses placeholder dashboard figures. Live reporting needs the order and payment data sources." },
+  reports: { title: "Reports", subtitle: "Prepare and export operational summaries.", icon: "▧", cards: ["Sales report", "Order report", "Employee report", "Customer report"], note: "Report exports will be enabled after the corresponding live data sources are connected." },
+  activity: { title: "Employee activity", subtitle: "Monitor staff access and recent activity.", icon: "◷", cards: ["Last active", "Sign-in history", "Role overview", "Account status"], note: "Employee last-active timestamps are stored. Full sign-in history requires an audit log." },
+  settings: { title: "Settings", subtitle: "Manage dashboard preferences and store configuration.", icon: "⚙", cards: ["Admin profile", "Store details", "Notifications", "Security"], note: "Security and store settings should be connected to persistent configuration before editing is enabled." }
+};
+app.get("/admin/:section(orders|customers|analytics|reports|activity|settings)", (req, res) => {
+  const page = adminPages[req.params.section];
+  res.render("workspace-page", { page, active: req.params.section, totalEmployees: 0, activeEmployees: 0 });
+});
+
 app.get("/admin", async (req, res) => {
   try {
     const totalEmployees = await Employee.countDocuments();
